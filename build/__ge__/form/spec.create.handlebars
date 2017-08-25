@@ -1,0 +1,16 @@
+import * as React from 'react';
+import configureStore from 'redux-mock-store';
+import {{componentUpper}}, { {{componentUpper}}Props } from './{{componentUpper}}';
+import {shallow, mount} from 'enzyme';
+
+test('\u2665 {{componentUpper}}: props', () => {
+  const store = configureStore()({ {{namespace}}: {loading: true} });
+  const wrapper = shallow(<{{componentUpper}} {...store} />, {context: {store}});
+  expect(wrapper.props().{{namespace}}).toEqual({loading: true});
+});
+
+test('\u2665 {{componentUpper}}: ui', () => {
+  const store = configureStore()({ {{namespace}}: {loading: true} });
+  const wrapper = mount(<{{componentUpper}} {...store} />, {context: {store}});
+  expect(wrapper.find('div').getDOMNode()).toBeTruthy();
+});

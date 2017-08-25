@@ -1,0 +1,45 @@
+import { queryAjax } from './{{componentUpper}}.service';
+import { parse } from 'qs';
+import { message } from 'antd';
+
+export default {
+  namespace: '{{namespace}}',
+  state: {
+    loading: false,
+  },
+
+  subscriptions: {
+    setup({ dispatch, history }) {
+      history.listen(location => {
+        //if (location.pathname === '/index/{{path}}') {
+          //dispatch({ type: 'query', payload: parse(location.query) });
+        //}
+      });
+    }
+  },
+
+  effects: {
+    *query({ payload }, { call, put }) {
+      yield put({ type: 'changeLoading', payload: { loading: true } });
+      const result = yield call(queryAjax, { ...payload });
+      if (result && result.state === 0) {
+        yield put({ type: 'querySuccess', payload: { loading: false } });
+      } else {
+        yield put({ type: 'queryError', payload: { loading: false } });
+      }
+    },
+  },
+
+  reducers: {
+    changeLoading(state, action) {
+      return { ...state, ...action.payload };
+    },
+    querySuccess(state, action) {
+      return { ...state, ...action.payload };
+    },
+  },
+}
+
+export interface {{componentUpper}}State {
+  loading: boolean
+}

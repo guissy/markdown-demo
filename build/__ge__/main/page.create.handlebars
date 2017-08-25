@@ -1,0 +1,27 @@
+import { connect } from 'dva';
+import { Button } from 'antd';
+import * as React from 'react';
+import * as styles from './{{componentUpper}}.less';
+import { {{componentUpper}}State } from './{{componentUpper}}.model';
+
+@connect(({ {{namespace}} }) => ({ {{namespace}} }))
+export default class {{componentUpper}} extends React.PureComponent<{{componentUpper}}Props, any> {
+
+  constructor(props){
+    super(props);
+    this.state = {
+
+    }    
+  }
+  public render() {
+    return (
+        <div>
+            {{componentUpper}} Works!!!
+        </div>
+    );
+  }
+}
+
+export interface {{componentUpper}}Props extends ReduxProps {
+  {{namespace}}?: {{componentUpper}}State;
+}

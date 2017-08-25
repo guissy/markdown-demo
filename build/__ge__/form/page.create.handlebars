@@ -1,0 +1,52 @@
+import { Button, Form, Input } from 'antd';
+import { WrappedFormUtils } from 'antd/es/form/Form';
+import { connect } from 'dva';
+import * as React from 'react';
+import { LangSiteState } from '../lang.model';
+import * as styles from './{{componentUpper}}.less';
+import { {{componentUpper}}State } from './{{componentUpper}}.model';
+
+@connect(({ {{namespace}}, lang }) => ({ {{namespace}}, site: lang.site }))
+@Form.create()
+export default class {{componentUpper}} extends React.PureComponent<{{componentUpper}}Props, any> {
+
+  constructor(props){
+    super(props);
+    this.state = {
+
+    }    
+  }
+  public render() {
+    const { getFieldDecorator } = this.props.form;
+    const { site } = this.props;
+    const formItemLayout = { span: 14 };
+    const tailFormItemLayout = { span: 14, offset: 6 };
+    return (
+        <Form className={styles.page} onSubmit={this.onSubmit}>
+            <Form.Item label={site.用户名} {...formItemLayout}>
+                {getFieldDecorator('name', {
+                initialValue: '',
+                rules: [{ required: true, message: site.请输入您的用户名 }],
+                })(<Input />)}
+            </Form.Item>
+            <Form.Item {...tailFormItemLayout}>
+                <Button type="primary" htmlType="submit" size="large">登录</Button>
+            </Form.Item>
+        </Form>
+    );
+  }
+  
+  private onSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    this.props.form.validateFields((err, fieldsValue) => {
+      if (err) {
+        return;
+      }
+      this.props.dispatch({ type: '{{namespace}}/submit', payload: fieldsValue });
+    });
+  }
+}
+
+export interface {{componentUpper}}Props extends ReduxProps, LangSiteState {
+  {{namespace}}?: {{componentUpper}}State;
+  form: WrappedFormUtils;
+}

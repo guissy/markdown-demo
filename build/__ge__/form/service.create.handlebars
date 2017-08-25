@@ -1,0 +1,6 @@
+import { stringify } from 'querystring';
+import request from '{{componentCD}}utils/request';
+
+export async function queryAjax(params) {
+  return request(`/api/{{apiPath}}?${stringify(params)}`);
+}

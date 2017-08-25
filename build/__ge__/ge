@@ -1,0 +1,123 @@
+#!/usr/bin/env node
+
+/**
+ * 安装：
+ * 包含一个 ge 命令文件和 boilerplates 模板文件夹
+ *
+ * ge 和 boilerplates 需要放置在项目根目录下
+ * 依赖以下组件，使用 npm i -D dva-cli stringify-object
+ * "dva-cli": "^0.6.0",
+ * "stringify-object": "^3.1.0"
+ *
+ * 使用：
+ * Mac 下使用 ./ge user/boy boilerplates/example.js
+ * Win 下使用 node ge user/boy boilerplates/boilerplates.js
+ *
+ * 其中 boy.js 为 类似以下的文件，
+ * dim 是用于"表格的表头名称"
+ * data 一般从后端API文档复制请求后的 json
+ *
+ * exports.dim = { id: "编号" }
+ * exports.data = { id: "9527" }
+ *
+ *
+ */
+
+const program = require('commander');
+const { camelCase } = require('lodash');
+const path = require('path');
+const fs = require('fs');
+const utils = require('./lib/api/utils');
+const dvaAst = require('./index');
+const upperCamelCase = require('simple-uppercamelcase');
+const { info, error } = require('./lib/log');
+const assert = require('assert');
+const { outputFileSync } = require('fs-extra');
+const { readFileSync, existsSync } = require('fs');
+const Handlebars = require('handlebars');
+
+function getTemplate(folder, fileType) {
+  const filePath = path.join(__dirname, folder, `./${fileType}.handlebars`);
+  // assert(existsSync(filePath), `getTemplate: file ${fileType} not fould`);
+  if (!existsSync(filePath)) return;
+  const source = readFileSync(filePath, 'utf-8');
+  return Handlebars.compile(source);
+}
+function create(fileType, filePath, payload) {
+  assert(payload.componentName, 'payload should have componentName');
+  const template = getTemplate(payload.folder, `${fileType}.create`);
+  if (template) {
+    const source = template(payload);
+    const fullPath = path.join(payload.sourcePath, filePath);
+    assert(!existsSync(fullPath), 'file exists');
+    info('create', `${fileType} ${payload.namespace}`);
+    outputFileSync(fullPath, source, 'utf-8');
+  }
+}
+function generate(_program, { cwd }) {
+  const [name, folder] = _program.args;
+  const namespace = camelCase(name);
+  const componentLower = camelCase(name);
+  const componentUpper = upperCamelCase(componentLower);
+  const dashName = name.split('/').join('-');
+  const folderFileName = `${name}/${componentUpper}`;
+  const componentPath = `src/pages/${folderFileName}.tsx`;
+  const defaultRouter = 'src/router.tsx';
+  const entry = _program.entry || 'src/index.ts';
+  const apiPath = name.split('/').join('');
+  const payload = {
+    sourcePath: cwd,
+    path: name,
+    folder: folder || 'main',
+    namespace,
+    dashName,
+    entry,
+    apiPath,
+    cssName: 'page',
+    pathDot: name.split('/').join('.'),
+    componentCD: '../'.repeat(name.split('/').length + 1),
+    componentUpper,
+    componentLower,
+    componentName: componentUpper,
+    response: `{
+        'id|+1': 1,
+      },`,
+  };
+
+  create('models', `src/pages/${folderFileName}.model.ts`, payload);
+  create('service', `src/pages/${folderFileName}.service.ts`, payload);
+  create('spec', `src/pages/${folderFileName}.spec.tsx`, payload);
+  create('less', `src/pages/${folderFileName}.less`, payload);
+  create('less.d', `src/pages/${folderFileName}.less.d.ts`, payload);
+  create('page', `src/pages/${folderFileName}.tsx`, payload);
+  create('mock', `mock/${namespace}.mock.js`, payload);
+
+  if (folder=='main') {
+    // 生成路由
+    info('create', `route ${name} with ${componentPath}`);
+    info('register', `to router ${_program.router || defaultRouter}`);
+    const arr = name.split('/');
+    let pathName = '';
+    let parentId = '';
+    if (arr.length === 1) {
+      pathName = name;
+      parentId = 'Route-/';
+    } else if (arr.length === 2) {
+      pathName = arr[1];
+      parentId = `Route-${arr[0]}`;
+    }
+    dvaAst.api('router.createRoute', {
+      filePath: _program.router || defaultRouter,
+      sourcePath: cwd,
+      path: pathName,
+      parentId,
+      component: {
+        componentName: componentUpper,
+        filePath: componentPath,
+      },
+    });
+  }
+}
+
+program.parse(process.argv);
+generate(program, { cwd: process.cwd() });

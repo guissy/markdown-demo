@@ -1,0 +1,27 @@
+import { queryAjax } from './{{componentUpper}}.service';
+import { parse } from 'qs';
+import { message } from 'antd';
+
+export default {
+  namespace: '{{namespace}}',
+  state: {
+  },
+
+  effects: {
+    *query({ payload }, { call, put }) {
+      const result = yield call(queryAjax);
+      if (result && result.state === 0) {
+        yield put({ type: 'querySuccess', payload: {  } });
+      }
+    },
+  },
+
+  reducers: {
+    querySuccess(state, action) {
+      return { ...state, ...action.payload };
+    },
+  },
+}
+
+export interface {{componentUpper}}State {
+}

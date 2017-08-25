@@ -1,0 +1,36 @@
+{
+  "extends": ["tslint:latest", "tslint-react", "tslint-config-airbnb", "tslint-eslint-rules"],
+  "rules": {
+    "interface-name": [true, "never-prefix"],
+    "object-literal-sort-keys": false,
+    "quotemark": [true, "single", "avoid-escape", "jsx-double"],
+    "max-line-length": {
+      "options": [120]
+    },
+    "new-parens": true,
+    "no-arg": true,
+    "no-bitwise": true,
+    "no-conditional-assignment": true,
+    "no-consecutive-blank-lines": false,
+    "no-console": {
+      "options": [
+        "debug",
+        "info",
+        "log",
+        "time",
+        "timeEnd",
+        "trace"
+      ]
+    },
+    "ter-arrow-parens": false,
+    "jsx-no-multiline-js": false,
+    "jsx-no-lambda": false,
+    "jsx-wrap-multiline": false,
+    "semicolon": [true, "always", "ignore-bound-class-methods"]
+  },
+  "jsRules": {
+    "max-line-length": {
+      "options": [120]
+    }
+  }
+}
