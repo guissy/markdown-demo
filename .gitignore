@@ -13,3 +13,6 @@ npm-debug.log*
 # build for server
 /public
 !/public/index.html
+
+/.awcache
+/.idea
